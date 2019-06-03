@@ -371,7 +371,7 @@ int main()
 {
 	setlocale(LC_ALL, "RUS");
 	int equations_amount;
-	cout << "Kол-во ур-ий\tОшибка параллельная\tОшибка последовательная\tВремя параллельное (c)\tВремя последовательное (c)\n";
+	cout << "Kол-во ур-ий\tОшибка параллельная\tОшибка посл-ая\tВремя параллельное (c)\tВремя посл-ое (c)\tГаусс\n";
 	for (equations_amount = 10; equations_amount <= 640; equations_amount *= 2)
 	{
 		//cout << "Kоличество уравнений: " << equations_amount << endl;
@@ -400,8 +400,18 @@ int main()
 			}
 			cout << " = " << B[i] << endl;
 		}*/
+		//-----------------Гаусс---------------------
+		double t_g = clock();
+		vector<double> X_G=gauss(matrix,B);
+		t_g = (clock() - t_s) / 1000;
+		//-----------------------------------------
 
 		//vector<vector<double>> orig_matrix = matrix;
+		
+		
+		
+		
+		//--------------------------------Матричный Последовательный-------------------------------
 		double t_s = clock();
 		vector<vector<double>> s_reverse_matrix = search_reverse_matrix_sequential(matrix);
 		vector<double> X_S(equations_amount);
@@ -412,6 +422,10 @@ int main()
 				X_S[i] += s_reverse_matrix[i][j] * B[j];
 		}
 		t_s = (clock() - t_s) / 1000;
+		//--------------------------------------------------------------------------------------
+		
+		
+		//--------------------Матричный Параллельный--------------------------------
 		double t = clock();
 		vector<vector<double>> reverse_matrix = search_reverse_matrix(matrix);
 		// Вычисление обратной матрицы
@@ -442,6 +456,9 @@ int main()
 			cout << "\nx" << i + 1 << " = " << X[i];*/
 
 		t = (clock() - t) / 1000;
+		//--------------------------------------------------------------------
+		
+		
 		vector<double> check = parallel_result(matrix, X, equations_amount);
 		vector<double> check_s = parallel_result(matrix, X_S, equations_amount);
 		double sum = 0, sum_s = 0;
@@ -451,7 +468,7 @@ int main()
 			sum += abs(B[i] - check[i]);
 			sum_s += abs(B[i] - check_s[i]);
 		}
-		cout << equations_amount << "\t" << sum / equations_amount << "\t" << sum_s / equations_amount << "\t" << t << "\t" << t_s << endl;
+		cout << equations_amount << "\t" << sum / equations_amount << "\t" << sum_s / equations_amount << "\t" << t << "\t" << t_s << "\t" << t_g << endl;
 		//cout << "Kоличество уравнений: " << equations_amount << endl;
 		//cout << "\nОшибка: " << sum / equations_amount;
 		//cout << "\n\nВремя, затраченное на вычисление: " << t << "с.\n";
